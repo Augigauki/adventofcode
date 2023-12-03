@@ -18,7 +18,7 @@ const example = [
 	'.664.598..',
 ];
 
-const edgeCase = ['.+35.!633.'];
+const edgeCase = ['..+35*633..'];
 
 let sum = 0;
 let partNums = [];
