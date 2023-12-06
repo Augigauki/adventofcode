@@ -11,11 +11,11 @@ const example = text2.split('\n');
 
 const removeZeroes = (list) => {
 	for (let i = 0; i < list.length; i++) {
-		if (list[i] === 0) {
+		if (list[i] === '') {
 			list.splice(i, 1);
 		}
 	}
-	if (list.includes(0)) {
+	if (list.includes('')) {
 		list = removeZeroes(list);
 	}
 	return list;
@@ -48,21 +48,43 @@ const calculateWins = (races) => {
     return wins;
 };
 
-const day06 = (input) => {
-	const races = [];
+const calculateWin = (race) => {
     let wins = 0;
+    let record = race.distance;
+    for(let i = 0; i < race.time; i++){
+        let buttonPressed = i;
+        let distance = buttonPressed * (race.time-i);
+        if(distance > record){
+            wins += 1;
+        }
+    }
+    return wins;
+}
+
+const day06 = (input) => {
+    let wins = 0;
+    let time = 0;
 	let times = input[0].split(':')[1].trim().split(' ');
-	times = times.map((time) => Number(time));
+	//times = times.map((time) => Number(time));
 	times = removeZeroes(times);
+    let distance = 0;
 	let distances = input[1].split(':')[1].trim().split(' ');
-	distances = distances.map((distance) => Number(distance));
+	//distances = distances.map((distance) => Number(distance));
 	distances = removeZeroes(distances);
+    times.map((curr) => time += curr);
+    time = Number(time.slice(1));
+    distances.map((curr) => distance += curr);
+    distance = Number(distance.slice(1));
 	console.log(times);
+    console.log(time);
 	console.log(distances);
-	for (let i = 0; i < times.length; i++) {
-		races.push({ time: times[i], distance: distances[i] });
-	}
-	wins = calculateWins(races);
+    console.log(distance);
+	race = {
+        time: time,
+        distance: distance,
+    }
+    console.log(race);
+	wins = calculateWin(race);
     console.log(wins);
 };
 

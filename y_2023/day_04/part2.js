@@ -66,7 +66,7 @@ const day04 = (list) => {
 				break;
 			}
 		}
-		//console.log(`Card: ${id} | i: ${i} | Matches: ${matches}`);
+		console.log(`Card: ${id} | i: ${i} | Matches: ${matches}`);
 		//console.log(toBeAdded);
 
 		for (let j = list.length - 1; j > 0; j--) {
