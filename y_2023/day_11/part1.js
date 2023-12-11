@@ -30,10 +30,10 @@ const expandMap = (chart) => {
 			//console.log(chart);
 		}
 		let empty = true;
-		for (let j = 0; j < chart[0].length; j++) {
+		for (let j = 0; j < chart[i].length; j++) {
 			for(let k = 0; k < chart.length; k++){
 
-				if (chart[j][k] !== '.') {
+				if (chart[i][j] !== '.') {
 					empty = false;
 					break;
 				}
