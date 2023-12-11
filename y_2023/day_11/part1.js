@@ -11,8 +11,53 @@ const example2 = text3.split('\n');
 
 let galaxies = [];
 let minPaths = [];
+let allPaths = [];
+
+const expandMap = (chart) => {
+	let newChart = chart;
+	let hAdded = 0;
+	let vAdded = 0;
+	for (let i = 0; i < chart.length; i++) {
+		
+		if (chart[i].includes('#')) {
+			//console.log('Horizontal line contains a galaxy')
+		} else {
+			console.log('horizontal line empty at index ' + i);
+			//newChart = chart.toSpliced(i, 0, chart[i]);
+			newChart = newChart.toSpliced(i+hAdded, 0, newChart[i+hAdded])
+			hAdded++;
+			//console.log('\n');
+			//console.log(chart);
+		}
+		let empty = true;
+		for (let j = 0; j < chart[0].length; j++) {
+			for(let k = 0; k < chart.length; k++){
+
+				if (chart[j][k] !== '.') {
+					empty = false;
+					break;
+				}
+			}
+		}
+		if (empty) {
+			console.log('vertical line empty at index ' + i);
+			console.log(chart[i]);
+			for (let j = 0; j < chart.length; j++) {
+				console.log(`i: ${i} j: ${j}`)
+				//console.log(chart[i].slice(0, j-1) + '.' + chart[i].slice(j));
+				newChart[i] = chart[i].slice(0, j-1) + '.' + chart[i].slice(j);
+			}
+		}
+		//console.log(newChart);
+	}
+	return newChart;
+};
 
 const day11 = (input) => {
+	console.log(input);
+	input = expandMap(input);
+	console.log(input);
+	return;
 	for (let i = 0; i < input.length; i++) {
 		for (let j = 0; j < input[i].length; j++) {
 			let char = input[i][j];
@@ -76,8 +121,10 @@ const day11 = (input) => {
 	//console.log(galaxies);
 	galaxies.forEach((galaxy, index) => {
 		minPaths.push(Math.min(...galaxy.paths));
+		allPaths.push(galaxy.paths.reduce((acc, curr) => acc + curr));
 	});
-    console.log(minPaths);
+	console.log(minPaths);
+	console.log(allPaths.reduce((acc, curr) => acc + curr) / 2);
 };
 
-day11(example2);
+day11(example);
