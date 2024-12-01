@@ -9,6 +9,8 @@ const input = text.split('\n');
 const example = text2.split('\n');
 //const edgecase = text3.split('\n');
 
+let handTypes = ['highCard', 'onePair', 'twoPair', 'threeOfAKind', 'fullHouse', 'fourOfAKind', 'fiveOfAKind'];
+
 let cardStrength = {
 	2: 2,
 	3: 3,
@@ -34,37 +36,39 @@ const checkHandType = (hand) => {
 		counts[card] = (counts[card] || 0) + 1;
 	});
 	console.log(counts);
+	let val1, val2;
 	for (let i = 0; i < cards.length; i++) {
-		let val1, val2;
+		
 		let cardCount = counts[cards[i]];
 		//console.log(`i: ${i} | Checking: ${cardCount}`);
 		//console.log(`Hand: ${hand} | Cardcount: ${cardCount}`)
 		if (cardCount === 5) {
 			val1 = `five of ${cards[i]}s`;
-			i += cardCount - 1;
+			//i += cardCount - 1;
 		} else if (cardCount === 4) {
 			val1 = `four of ${cards[i]}s`;
-			i += cardCount - 1;
+			//i += cardCount - 1;
 		} else if (cardCount === 3) {
 			if (!val1) {
 				val1 = `three of ${cards[i]}s`;
-				i += cardCount - 1;
+				//i += cardCount - 1;
 			} else if (val1.startsWith('pair of')) {
-				val2 = `full house: 3 ${cards[i]}s, 2 ${val1}s`;
-				i += cardCount - 1;
+				val2 = `full house: 3 ${cards[i]}s, ${val1.split('of ')[1][0]}s`;
+				//i += cardCount - 1;
 			}
 		} else if (cardCount === 2) {
 			if (!val1) {
 				val1 = `pair of ${cards[i]}s`;
-				i += cardCount - 1;
+				//i += cardCount - 1;
 			} else if (val1.startsWith('pair of')) {
-				val2 = 'two pairs';
-				i += cardCount - 1;
+				val2 = 'two pairs: ' + val1.split('of ')[1][0] + 's and ' + cards[i] + 's';
+				//i += cardCount - 1;
 			} else if (val1.startsWith('three of')) {
-				val2 = `full house: 3 ${val1}s, 2 ${cards[i]}s`;
-				i += cardCount - 1;
+				val2 = `full house: 3 ${val1.split('of ')[1][0]}s, 2 ${cards[i]}s`;
+				//i += cardCount - 1;
 			}
 		} else {
+
 		}
 		if (val1) {
 			if (val2) {
@@ -72,6 +76,8 @@ const checkHandType = (hand) => {
 			} else {
 				handType = val1;
 			}
+		} else {
+			handType = 'high card'
 		}
 	}
 
@@ -87,8 +93,8 @@ const day07 = (hands) => {
 		//hand.sort();
 		//console.log(hand);
 
-		let handType = checkHandType(hand);
-		console.log('\n' + hand + ' ' + handType + '\n');
+		let type = checkHandType(hand);
+		console.log('\n' + hand + ' ' + type + '\n');
 	}
 };
 
