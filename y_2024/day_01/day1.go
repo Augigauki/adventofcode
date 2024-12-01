@@ -34,7 +34,7 @@ func main() {
 			right = append(right, trimmed[1])
 	}
 	
-	//getTotalDiffs(left, right)
+	getTotalDiffs(left, right)
 	getSimilarityScore(left, right)
 	
 
