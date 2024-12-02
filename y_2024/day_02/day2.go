@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	
-	file, err := os.Open("example.txt")
+
+	file, err := os.Open("input.txt")
 
 	if err != nil {
 		fmt.Println("Error reading file")
@@ -20,7 +20,7 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	var levels [][]int
-	for scanner.Scan(){
+	for scanner.Scan() {
 		var line string = scanner.Text()
 		parts := strings.Split(line, " ")
 		var trimmed []int
@@ -33,6 +33,7 @@ func main() {
 		//fmt.Println(trimmed)
 		levels = append(levels, trimmed)
 	}
-	fmt.Println(levels)
+
 	findSafe(levels)
+	findSafeWithExtraTolerance(levels)
 }
