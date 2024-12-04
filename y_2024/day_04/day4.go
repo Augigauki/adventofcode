@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("input.txt")
+	file, err := os.Open("example.txt")
 
 	if err != nil {
 		fmt.Println("Error reading file")
@@ -26,6 +26,8 @@ func main() {
 		wordGrid = append(wordGrid, row)
 	}
 	//fmt.Println(wordGrid)
-	totalXmas := FindXmas(wordGrid)
-	fmt.Println("Total XMAS: ", totalXmas)
+	//totalXmas := FindXmas(wordGrid)
+	//fmt.Println("Total X-MAS: ", totalXmas)
+	totalMasMas := FindMasMas(wordGrid)
+	fmt.Println("Total MAS MAS: ", totalMasMas)
 }
