@@ -83,10 +83,6 @@ func evaluateCombinations(numbers []int, currentIndex int, currentResult int, cu
 	// Try concatenation (|| operator)
 	// Concatenate currentResult and numbers[currentIndex] as strings
 	concatenated, _ := strconv.Atoi(fmt.Sprintf("%d%d", currentResult, numbers[currentIndex]))
-	if evaluateCombinations(numbers, currentIndex+1, concatenated,
-		fmt.Sprintf("%s || %d", currentExpression, numbers[currentIndex]), testValue) {
-		return true
-	}
-
-	return false
+	return evaluateCombinations(numbers, currentIndex+1, concatenated,
+		fmt.Sprintf("%s || %d", currentExpression, numbers[currentIndex]), testValue)
 }
