@@ -21,5 +21,7 @@ func main() {
 		var line string = scanner.Text()
 		equations = append(equations, line)
 	}
-	FindTrueEquations(equations)
+	extraEquations := GenerateExtraEquations(equations)
+	fmt.Println("Extra equations: ", extraEquations)
+	//FindTrueEquations(equations)
 }
