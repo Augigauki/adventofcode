@@ -56,37 +56,37 @@ func TestNumbers(testValue int, numbers []int) bool {
 	return evaluateCombinations(numbers, 1, numbers[0], strconv.Itoa(numbers[0]), testValue)
 }
 
+// Function to evaluate all possible combinations
 func evaluateCombinations(numbers []int, currentIndex int, currentResult int, currentExpression string, testValue int) bool {
-	result := false
-	// If we've reached the end of the slice, print the result and expression
+	// Base case: If we've reached the end of the slice
 	if currentIndex == len(numbers) {
 		fmt.Printf("Result: %d, Expression: %s\n", currentResult, currentExpression)
 		if currentResult == testValue {
 			fmt.Println("Found a valid expression!")
-			result = true
-			return result
+			return true
 		}
-		return result
+		return false
+	}
 
+	// Try addition
+	if evaluateCombinations(numbers, currentIndex+1, currentResult+numbers[currentIndex],
+		fmt.Sprintf("%s + %d", currentExpression, numbers[currentIndex]), testValue) {
+		return true
 	}
-	if result {
-		return result
-	}
-	// Add the current number
-	testPlus := evaluateCombinations(numbers, currentIndex+1, currentResult+numbers[currentIndex],
-		fmt.Sprintf("%s + %d", currentExpression, numbers[currentIndex]), testValue)
 
-	if testPlus {
-		result = true
-		return result
+	// Try multiplication
+	if evaluateCombinations(numbers, currentIndex+1, currentResult*numbers[currentIndex],
+		fmt.Sprintf("%s * %d", currentExpression, numbers[currentIndex]), testValue) {
+		return true
 	}
-	// Multiply the current number
-	testMultiply := evaluateCombinations(numbers, currentIndex+1, currentResult*numbers[currentIndex],
-		fmt.Sprintf("%s * %d", currentExpression, numbers[currentIndex]), testValue)
 
-	if testMultiply {
-		result = true
-		return result
+	// Try concatenation (|| operator)
+	// Concatenate currentResult and numbers[currentIndex] as strings
+	concatenated, _ := strconv.Atoi(fmt.Sprintf("%d%d", currentResult, numbers[currentIndex]))
+	if evaluateCombinations(numbers, currentIndex+1, concatenated,
+		fmt.Sprintf("%s || %d", currentExpression, numbers[currentIndex]), testValue) {
+		return true
 	}
-	return result
+
+	return false
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("oneline.txt")
+	file, err := os.Open("input.txt")
 
 	if err != nil {
 		fmt.Println("Error reading file")
@@ -22,6 +22,12 @@ func main() {
 		equations = append(equations, line)
 	}
 	extraEquations := GenerateExtraEquations(equations)
-	fmt.Println("Extra equations: ", extraEquations)
-	//FindTrueEquations(equations)
+	fmt.Println("Extra equations:")
+	for _, eq := range extraEquations {
+		fmt.Println(eq)
+	}
+	/* Part 1 */
+	FindTrueEquations(equations)
+	/* Part 2 */
+	//FindTrueEquations(extraEquations)
 }
