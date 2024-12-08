@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// This is a placeholder for the main function
-	file, err := os.Open("example2.txt")
+	file, err := os.Open("input.txt")
 	if err != nil {
 		fmt.Println("Error reading file")
 		return

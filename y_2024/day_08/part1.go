@@ -48,7 +48,10 @@ func FindAntinodes(antennaMap [][]string) {
 	for _, otherPosSlice := range allOtherPoses {
 		fmt.Println(otherPosSlice)
 	}
-	PlaceAntinodes(antennaMap, allOtherPoses)
+	/* Part 1: */
+	//PlaceAntinodes(antennaMap, allOtherPoses)
+	/* Part 2: */
+	PlaceAntinodesHarmonically(antennaMap, allOtherPoses)
 }
 
 func FindAllMatchingAntenna(currPos Position, antennaMap [][]string, currChar string) OtherPosSlice {
@@ -89,10 +92,12 @@ func PlaceAntinodes(antennaMap [][]string, poses []OtherPosSlice) {
 							firstAntinode = Position{pos.line - (nextPos.line - pos.line), pos.char - (nextPos.char - pos.char)}
 							secondAntinode = Position{nextPos.line + (nextPos.line - pos.line), nextPos.char + (nextPos.char - pos.char)}
 						} else {
+
 							firstAntinode = Position{pos.line - (nextPos.line - pos.line), pos.char + (pos.char - nextPos.char)}
 							secondAntinode = Position{nextPos.line + (nextPos.line - pos.line), nextPos.char - (pos.char - nextPos.char)}
 						}
 					} else {
+						fmt.Println("Are we ever here?")
 						fmt.Println("Antinode should be placed downwards")
 						/* Checking if antinode should be placed diagonally down left */
 						if (nextPos.char - pos.char) > 0 {
