@@ -4,15 +4,8 @@ import (
 	"fmt"
 )
 
-type Position struct {
-	line int
-	char int
-}
+func TraverseMapWithGuard(guard Guard, guardMap [][]string) {
 
-type TraversedMap struct {
-	startPos     Position
-	traversedMap [][]string
-	stuckInLoop  bool
 }
 
 func TraverseMap(startPos Position, guardMap [][]string) TraversedMap {
@@ -52,7 +45,7 @@ func TraverseMap(startPos Position, guardMap [][]string) TraversedMap {
 			stuckInLoop = true
 			break
 		} */
-		fmt.Println("Steps and limit: ", steps, limit)
+		//fmt.Println("Steps and limit: ", steps, limit)
 		if steps > limit {
 			fmt.Println("Guard has taken too many steps! Breaking out!")
 			stuckInLoop = true

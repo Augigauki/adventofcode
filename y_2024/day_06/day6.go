@@ -6,6 +6,30 @@ import (
 	"os"
 )
 
+type Position struct {
+	line int
+	char int
+}
+
+type Pos struct {
+	line   int
+	char   int
+	visits int
+}
+
+type TraversedMap struct {
+	startPos     Position
+	traversedMap [][]string
+	stuckInLoop  bool
+}
+
+type Guard struct {
+	direction string
+	positions []Position
+	pos       Pos
+	startPos  Position
+}
+
 func main() {
 	file, err := os.Open("input.txt")
 	if err != nil {
