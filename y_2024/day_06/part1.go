@@ -81,7 +81,7 @@ func TraverseMap(startPos Position, guardMap [][]string) TraversedMap {
 							hitManualObstacle = true
 						} else {
 							stuckInLoop = true
-
+							break
 						}
 					} else {
 						pos.line = pos.line - 1
@@ -101,7 +101,7 @@ func TraverseMap(startPos Position, guardMap [][]string) TraversedMap {
 							hitManualObstacle = true
 						} else {
 							stuckInLoop = true
-
+							break
 						}
 					} else {
 						pos.char = pos.char + 1
@@ -120,7 +120,7 @@ func TraverseMap(startPos Position, guardMap [][]string) TraversedMap {
 							hitManualObstacle = true
 						} else {
 							stuckInLoop = true
-
+							break
 						}
 					} else {
 						pos.line = pos.line + 1
@@ -139,7 +139,7 @@ func TraverseMap(startPos Position, guardMap [][]string) TraversedMap {
 							hitManualObstacle = true
 						} else {
 							stuckInLoop = true
-
+							break
 						}
 					} else {
 						pos.char = pos.char - 1
