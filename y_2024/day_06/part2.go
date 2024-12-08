@@ -283,14 +283,14 @@ func TraverseWithObstacles(startPos Position, guardMap [][]string) {
 }
 
 func AddToChecked(checkedPoses []Position, line, char int) bool {
-	fmt.Println("Checked poses: ", checkedPoses)
+	//fmt.Println("Checked poses: ", checkedPoses)
 	newPos := Position{line, char}
 	for _, pos := range checkedPoses {
 		if pos == newPos {
-			fmt.Println("Position has been checked before! Returning false")
+			//fmt.Println("Position has been checked before! Returning false")
 			return false
 		}
 	}
-	fmt.Printf("Position %v has not been checked before! Returning true\n", newPos)
+	//fmt.Printf("Position %v has not been checked before! Returning true\n", newPos)
 	return true
 }
