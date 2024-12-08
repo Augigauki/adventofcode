@@ -6,28 +6,16 @@ import (
 	"os"
 )
 
-type Position struct {
-	line int
-	char int
-}
-
 type Pos struct {
 	line   int
 	char   int
 	visits int
 }
 
-type TraversedMap struct {
-	startPos     Position
-	traversedMap [][]string
-	stuckInLoop  bool
-}
-
 type Guard struct {
 	direction string
-	positions []Position
+	positions []Pos
 	pos       Pos
-	startPos  Position
 }
 
 func main() {
@@ -49,11 +37,13 @@ func main() {
 		}
 		guardMap = append(guardMap, chars)
 	}
-	startPos := FindStartPos(guardMap)
-	traversedMap := TraverseMap(startPos, guardMap)
-	/* fmt.Println("\n::  TRAVERSED MAP  ::")
-	for _, line := range traversedMap.traversedMap {
+	startPos := FindStartPos2(guardMap)
+	//traversedMap := TraverseMap(startPos, guardMap)
+	part1 := TraverseMapWithGuard(guardMap)
+	fmt.Println("New traversed map:")
+	for _, line := range part1.traversedMap {
 		fmt.Println(line)
-	} */
-	TraverseWithObstacles(traversedMap.startPos, traversedMap.traversedMap)
+	}
+	totalObstacles := CountObstaclePlacements(guardMap, part1.visitedPositions, startPos)
+	fmt.Println("Total obstacles: ", totalObstacles)
 }
