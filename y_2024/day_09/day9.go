@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("example.txt")
+	file, err := os.Open("input.txt")
 
 	if err != nil {
 		fmt.Println("Error reading file")
@@ -30,5 +30,6 @@ func main() {
 		diskMap = scanner.Text()
 	} */
 	//fmt.Println("Disk map: ", diskMap)
-	MoveFiles(diskMap)
+	//MoveFiles(diskMap)
+	MoveEntireFiles(diskMap)
 }
