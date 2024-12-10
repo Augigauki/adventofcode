@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("example.txt")
+	file, err := os.Open("input.txt")
 
 	if err != nil {
 		fmt.Println("Error reading file")
@@ -24,15 +24,22 @@ func main() {
 		stringNums := strings.Split(line, "")
 		chars := []int{}
 		for _, char := range stringNums {
-			num, err := strconv.Atoi(char)
-			if err != nil {
-				fmt.Println("Error converting to int")
-				break
+			if char == "." {
+				chars = append(chars, -1)
+			} else {
+				num, err := strconv.Atoi(char)
+				if err != nil {
+					fmt.Println("Error converting to int")
+					break
+				}
+				chars = append(chars, num)
 			}
-			chars = append(chars, num)
+
 		}
 		topoMap = append(topoMap, chars)
 	}
-
+	/* for _, row := range topoMap {
+		fmt.Println(row)
+	} */
 	FindTrailHeadScores(topoMap)
 }
