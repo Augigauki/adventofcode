@@ -18,7 +18,7 @@ type GardenMapPos struct {
 } */
 
 func main() {
-	fileName := "example.txt"
+	fileName := "input.txt"
 	file, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal("Error opening file: ", fileName)

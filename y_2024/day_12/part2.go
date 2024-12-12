@@ -2,31 +2,35 @@ package main
 
 import "fmt"
 
-/* type Plant struct {
-	Pos Pos
-} */
-
 type Plot struct {
 	Seed   string
-	Plants []Pos
+	Plants []Plant
 	Area   int
 	Sides  int
+}
+
+type Plant struct {
+	Pos              Pos
+	OutOfBoundsPoses []Pos
+	Corners          int
 }
 
 func CalcFenceCostWithDiscount(gardenMap [][]string) int {
 	var totalCost int
 	visited := make(map[Pos]bool)
-	plots := []Plot{}
+	//plots := []Plot{}
 
 	for i, line := range gardenMap {
 		for j, char := range line {
 			if !visited[Pos{i, j}] {
-				plant := char
-				plot := FindPlots(gardenMap, Pos{i, j}, visited, plant)
-				plot.Sides = CalculateSides(plot, gardenMap)
-				fmt.Println("Walls: ", plot.Sides, " for plant: ", plant)
-				cost := plot.Area * plot.Sides
-				plots = append(plots, plot)
+				seed := char
+				plot := FindPlots(gardenMap, Pos{i, j}, visited, seed)
+				corners := 0
+				for _, plant := range plot.Plants {
+					corners += plant.Corners
+				}
+				fmt.Println("Walls: ", corners, " for plant: ", seed)
+				cost := plot.Area * corners
 				totalCost += cost
 			}
 		}
@@ -47,8 +51,14 @@ func FindPlots(gardenMap [][]string, pos Pos, visited map[Pos]bool, plant string
 		if visited[curr] {
 			continue
 		}
+		outOfBounds := SumOutOfBounds(curr, gardenMap, plant)
+		/* Count corners for position */
+		corners := 0
+		cardinalAndDiagonal := GetCardinalAndDiagonal(gardenMap, curr, plant)
+		//fmt.Println("\nCalculating corners for plant: ", curr, " with seed ", plant)
+		corners = CalcCorners(curr, cardinalAndDiagonal)
 
-		plot.Plants = append(plot.Plants, curr)
+		plot.Plants = append(plot.Plants, Plant{Pos: curr, OutOfBoundsPoses: outOfBounds, Corners: corners})
 		visited[curr] = true
 		area++
 
@@ -64,23 +74,77 @@ func FindPlots(gardenMap [][]string, pos Pos, visited map[Pos]bool, plant string
 	return plot
 }
 
-func CalculateSides(plot Plot, gardenMap [][]string) int {
-	visitedBoundary := make(map[Pos]bool)
-	sides := 0
+func CalcCorners(pos Pos, allDirections map[Pos]bool) int {
 
-	for _, plant := range plot.Plants {
-		for _, dir := range Directions {
-			newPos := Pos{plant.line + dir[0], plant.char + dir[1]}
-			if !InBounds(gardenMap, newPos) || gardenMap[newPos.line][newPos.char] != plot.Seed {
-				// Check if this boundary segment has already been counted
-				if !visitedBoundary[Pos{plant.line, plant.char}] {
-					sides++
-					TraverseBoundary(Pos{plant.line, plant.char}, gardenMap, plot.Seed, visitedBoundary)
-				}
-			}
+	corners := 0
+	northPos := Pos{pos.line - 1, pos.char}
+	southPos := Pos{pos.line + 1, pos.char}
+	eastPos := Pos{pos.line, pos.char + 1}
+	westPos := Pos{pos.line, pos.char - 1}
+	northEastPos := Pos{pos.line - 1, pos.char + 1}
+	northWestPos := Pos{pos.line - 1, pos.char - 1}
+	southEastPos := Pos{pos.line + 1, pos.char + 1}
+	southWestPos := Pos{pos.line + 1, pos.char - 1}
+	north := allDirections[northPos]
+	south := allDirections[southPos]
+	east := allDirections[eastPos]
+	west := allDirections[westPos]
+	northEast := allDirections[northEastPos]
+	northWest := allDirections[northWestPos]
+	southEast := allDirections[southEastPos]
+	southWest := allDirections[southWestPos]
+
+	if !north && !east {
+		corners++
+	}
+	if !north && !west {
+		corners++
+	}
+	if !south && !east {
+		corners++
+	}
+	if !south && !west {
+		corners++
+	}
+	if !northEast && (north && east) {
+		corners++
+	}
+	if !northWest && (north && west) {
+		corners++
+	}
+	if !southEast && (south && east) {
+		corners++
+	}
+	if !southWest && (south && west) {
+		corners++
+	}
+	return corners
+}
+
+func GetCardinalAndDiagonal(gardenMap [][]string, pos Pos, seed string) map[Pos]bool {
+	cardinalAndDiagonal := make(map[Pos]bool)
+
+	for _, dir := range AllDirections {
+		newPos := Pos{pos.line + dir[0], pos.char + dir[1]}
+		if InBounds(gardenMap, newPos) && gardenMap[newPos.line][newPos.char] == seed {
+			cardinalAndDiagonal[newPos] = true
+		} else {
+			cardinalAndDiagonal[newPos] = false
 		}
 	}
-	return sides
+	return cardinalAndDiagonal
+}
+
+func SumOutOfBounds(pos Pos, gardenMap [][]string, seed string) []Pos {
+	outOfBounds := []Pos{}
+	for _, dir := range Directions {
+		newPos := Pos{pos.line + dir[0], pos.char + dir[1]}
+		if !InBounds(gardenMap, newPos) || gardenMap[newPos.line][newPos.char] != seed {
+
+			outOfBounds = append(outOfBounds, newPos)
+		}
+	}
+	return outOfBounds
 }
 
 func TraverseBoundary(start Pos, gardenMap [][]string, seed string, visited map[Pos]bool) {
