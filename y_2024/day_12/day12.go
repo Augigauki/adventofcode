@@ -30,6 +30,7 @@ func main() {
 	for scanner.Scan() {
 		gardenMap = append(gardenMap, strings.Split(scanner.Text(), ""))
 	}
-	CalcFenceCost(gardenMap)
+	//CalcFenceCost(gardenMap)
+	CalcFenceCostWithDiscount(gardenMap)
 
 }

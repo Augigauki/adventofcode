@@ -10,12 +10,8 @@ func InBounds(gardenMap [][]string, pos Pos) bool {
 }
 
 var Directions = [][]int{
-	/* North */
-	{-1, 0},
-	/* East */
-	{0, 1},
-	/* South */
-	{1, 0},
-	/* West */
-	{0, -1},
+	{-1, 0}, //Up
+	{0, 1},  //Right
+	{1, 0},  //Down
+	{0, -1}, //Left
 }
