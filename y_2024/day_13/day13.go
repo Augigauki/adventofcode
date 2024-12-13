@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"log"
+	"math/big"
 	"os"
 	"strconv"
 	"strings"
 )
 
 func main() {
-	fileName := "example.txt"
+	fileName := "input.txt"
 	file, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal("Error opening file: ", fileName)
@@ -37,7 +38,34 @@ func main() {
 		fmt.Printf("%+v\n", cm)
 	} */
 	//Part1(clawMachines)
-	Part2(clawMachines)
+	bigClawMachines := convertToBigClawMachines(clawMachines)
+	Part2(bigClawMachines)
+}
+
+func convertToBigClawMachines(clawMachines []ClawMachine) []BigClawMachine {
+	var bigClawMachines []BigClawMachine
+	for _, machine := range clawMachines {
+		bigMachine := BigClawMachine{
+			A: BigButton{
+				lineIncr: big.NewInt(int64(machine.A.lineIncr)),
+				charIncr: big.NewInt(int64(machine.A.charIncr)),
+			},
+			B: BigButton{
+				lineIncr: big.NewInt(int64(machine.B.lineIncr)),
+				charIncr: big.NewInt(int64(machine.B.charIncr)),
+			},
+			Prize: BigPos{
+				line: big.NewInt(int64(machine.Prize.line)),
+				char: big.NewInt(int64(machine.Prize.char)),
+			},
+			Pos: BigPos{
+				line: big.NewInt(0),
+				char: big.NewInt(0),
+			},
+		}
+		bigClawMachines = append(bigClawMachines, bigMachine)
+	}
+	return bigClawMachines
 }
 
 func parseClawMachine(machine string) (ClawMachine, error) {

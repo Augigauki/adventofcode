@@ -12,13 +12,6 @@ type ClawMachine struct {
 	Pos   Pos
 }
 
-type MathMachine struct {
-	Ax, Ay int
-	Bx, By int
-	PrizeX int
-	PrizeY int
-}
-
 type Button struct {
 	lineIncr int
 	charIncr int
