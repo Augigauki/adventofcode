@@ -16,29 +16,29 @@ type Robot struct {
 }
 
 func Part1(space [][]string, robots []Robot) int {
-	fmt.Println("Space:")
+	/* fmt.Println("Space:")
 	for _, line := range space {
 		fmt.Println(line)
-	}
+	} */
 	var robotMap = make(map[Pos]int)
 	width := len(space[0])
 	height := len(space)
 	//testRobot := Robot{Pos{2, 4}, Pos{2, -3}}
 	//testRobots := []Robot{testRobot}
 	//fmt.Println("Test robot: ", testRobot)
-	fmt.Println("Robots:")
+	/* fmt.Println("Robots:")
 	for i, robot := range robots {
 		fmt.Printf("Robot %v at position %v with velocity %v\n", i+1, robot.P, robot.V)
 		robotMap[robot.P] = robotMap[robot.P] + 1
-	}
+	} */
 	placeRobots(space, robotMap, robots, 100)
 
 	fmt.Println("Robot map:")
 	var ne, nw, se, sw, safetyFactor int
-	fmt.Println("Width / 2: ", width/2, " Height / 2: ", height/2)
+	//fmt.Println("Width / 2: ", width/2, " Height / 2: ", height/2)
 	for pos, value := range robotMap {
 		if value > 0 {
-			fmt.Println("Position: ", pos, " Robots: ", value)
+			//fmt.Println("Position: ", pos, " Robots: ", value)
 			if pos.x < width/2 && pos.y < height/2 {
 				nw += value
 			} else if pos.x > width/2 && pos.y < height/2 {
@@ -60,7 +60,7 @@ func Part1(space [][]string, robots []Robot) int {
 }
 
 func placeRobots(space [][]string, robotMap map[Pos]int, robots []Robot, limit int) {
-	for i := 0; i < limit; i++ {
+	for i := 0; i < 10000000; i++ {
 		for j := range robots {
 			robot := &robots[j]
 			//fmt.Println("Robot position: ", robot.P)
@@ -74,11 +74,23 @@ func placeRobots(space [][]string, robotMap map[Pos]int, robots []Robot, limit i
 			robotMap[robot.P] = robotMap[robot.P] + 1
 			space[robot.P.y][robot.P.x] = strconv.Itoa(robotMap[robot.P])
 		}
+		counter := 0
+		fmt.Println("Second: ", i, ". Checking if all robots are alone...")
+		for _, v := range robotMap {
+			if v == 1 {
+				counter++
+			}
+		}
+		fmt.Println("robots.length: ", len(robots), "Counter: ", counter)
+		if counter == len(robots) {
+			fmt.Println("All robots are alone at second: ", i, "!")
+			break
+		}
 	}
-	fmt.Println("Space after robots:")
+	/* fmt.Println("Space after robots:")
 	for _, line := range space {
 		fmt.Println(line)
-	}
+	} */
 }
 
 func getNextPos(bot *Robot, space [][]string) Robot {
