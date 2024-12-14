@@ -83,7 +83,7 @@ func placeRobots(space [][]string, robotMap map[Pos]int, robots []Robot, limit i
 		}
 		fmt.Println("robots.length: ", len(robots), "Counter: ", counter)
 		if counter == len(robots) {
-			fmt.Println("All robots are alone at second: ", i, "!")
+			fmt.Println("All robots are alone at second: ", i+1, "!")
 			break
 		}
 	}
