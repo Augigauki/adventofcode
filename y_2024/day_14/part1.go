@@ -31,7 +31,7 @@ func Part1(space [][]string, robots []Robot) int {
 		fmt.Printf("Robot %v at position %v with velocity %v\n", i+1, robot.P, robot.V)
 		robotMap[robot.P] = robotMap[robot.P] + 1
 	} */
-	placeRobots(space, robotMap, robots, 100)
+	placeRobots(space, robotMap, robots, 10000000)
 
 	fmt.Println("Robot map:")
 	var ne, nw, se, sw, safetyFactor int
@@ -60,7 +60,7 @@ func Part1(space [][]string, robots []Robot) int {
 }
 
 func placeRobots(space [][]string, robotMap map[Pos]int, robots []Robot, limit int) {
-	for i := 0; i < 10000000; i++ {
+	for i := 0; i < limit; i++ {
 		for j := range robots {
 			robot := &robots[j]
 			//fmt.Println("Robot position: ", robot.P)
