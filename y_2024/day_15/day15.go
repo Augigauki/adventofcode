@@ -22,19 +22,10 @@ type Direction struct {
 	Dir  []int
 }
 
-type Box struct {
-	Pos      Pos
-	GPSCoord int
-}
-
-type Wall struct {
-	Pos Pos
-}
-
 var Directions = []Direction{{"N", []int{0, -1}}, {"E", []int{1, 0}}, {"S", []int{0, 1}}, {"W", []int{-1, 0}}}
 
 func main() {
-	fileName := "input.txt"
+	fileName := "example3.txt"
 	file, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal("Error opening file: ", fileName)
@@ -88,7 +79,7 @@ func main() {
 		botMovs = append(botMovs, newMov)
 	}
 	bot := Bot{botStartPos, Directions[0], botMovs}
-	Part1(goodsMap, bot)
+	GetTotalGpsSum(goodsMap, bot)
 	//fmt.Println("Movements: ", botMovs, " Length: ", len(movements))
 
 }
