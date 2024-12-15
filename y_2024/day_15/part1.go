@@ -64,10 +64,10 @@ func expandMap(origMap [][]string) [][]string {
 
 func MoveBotWiderMap(posMap map[Pos]string, bot Bot, width, height int) {
 	fmt.Println("Moving bot in wider map")
-	fmt.Println("PosMap:")
+	/* fmt.Println("PosMap:")
 	for pos, value := range posMap {
 		fmt.Println(pos, value)
-	}
+	} */
 	for _, mov := range bot.Movements {
 		fmt.Println("\nBot pos: ", bot.Pos)
 		fmt.Println("Bot mov: ", mov)
@@ -151,55 +151,55 @@ func MoveBot(posMap map[Pos]string, bot Bot, width, height int) {
 
 func CheckIfWideBoxCanBeMoved(posMap map[Pos]string, dir Direction, bot *Bot) map[Pos]string {
 	fmt.Println("Checking if wide box can be moved...")
+
+	// Identify the position of the first box part
 	origPos := bot.Pos
 	nextPos := Pos{bot.Pos.Char + dir.Dir[1], bot.Pos.Line + dir.Dir[0]}
-	origNextPos := nextPos
-	boxesMap := make(map[Pos]string)
-	if dir.Name == "N" {
-		line := nextPos.Line
-		boxesMap[nextPos] = posMap[nextPos]
-		leftPos := Pos{nextPos.Char - 1, nextPos.Line}
-		rightPos := Pos{nextPos.Char + 1, nextPos.Line}
-		for posMap[leftPos] == "[" || posMap[leftPos] == "]" {
-			boxesMap[leftPos] = posMap[leftPos]
-			leftPos = Pos{leftPos.Char - 1, leftPos.Line}
-		}
-		for posMap[rightPos] == "[" || posMap[rightPos] == "]" {
-			boxesMap[rightPos] = posMap[rightPos]
-			rightPos = Pos{rightPos.Char + 1, rightPos.Line}
-		}
 
-		for checkNextLine(posMap, boxesMap, line) {
-			boxesMap = findNextLineWideBoxes(posMap, bot.Pos, dir)
-			line--
-		}
-		fmt.Println("Boxes map: ", boxesMap)
+	// Identify all parts of the wide box
+	var boxParts []Pos
+	if posMap[nextPos] == "[" {
+		// Horizontal wide box (left-to-right)
+		boxParts = []Pos{nextPos, Pos{nextPos.Char + 1, nextPos.Line}}
+	} else if posMap[nextPos] == "]" {
+		// Horizontal wide box (right-to-left)
+		boxParts = []Pos{nextPos, Pos{nextPos.Char - 1, nextPos.Line}}
+	} else if posMap[nextPos] == "." {
+		fmt.Println("No box to move.")
+		return posMap
+	} else {
+		fmt.Println("Unexpected state: Box not detected!")
+		return posMap
+	}
 
+	// Check if all parts of the box can move
+	var newBoxPositions []Pos
+	for _, part := range boxParts {
+		newPos := Pos{part.Char + dir.Dir[1], part.Line + dir.Dir[0]}
+		if posMap[newPos] != "." {
+			fmt.Println("Wide box cannot be moved. Obstacle detected.")
+			return posMap
+		}
+		newBoxPositions = append(newBoxPositions, newPos)
 	}
-	if dir.Name == "W" || dir.Name == "E" {
-		for posMap[nextPos] == "[" || posMap[nextPos] == "]" {
-			nextPos = Pos{nextPos.Char + dir.Dir[1], nextPos.Line + dir.Dir[0]}
-			boxesMap[nextPos] = posMap[nextPos]
+
+	// Move the wide box
+	for _, part := range boxParts {
+		posMap[part] = "." // Clear the old box positions
+	}
+	for i, newPos := range newBoxPositions {
+		if i == 0 {
+			posMap[newPos] = "[" // First part of the box
+		} else {
+			posMap[newPos] = "]" // Second part of the box
 		}
 	}
-	for pos, value := range boxesMap {
-		fmt.Println("Pos: ", pos, " value: ", value)
-	}
-	if posMap[nextPos] == "." {
-		fmt.Println("Wide boxes can be moved!")
-		i := len(boxesMap)
-		for boxPos := range boxesMap {
-			if i%2 == 0 {
-				posMap[boxPos] = "]"
-			} else {
-				posMap[boxPos] = "["
-			}
-			i--
-		}
-		bot.Pos = origNextPos
-		posMap[origPos] = "."
-		posMap[bot.Pos] = "@"
-	}
+
+	// Move the robot
+	posMap[origPos] = "."                                               // Clear the robot's old position
+	bot.Pos = Pos{bot.Pos.Char + dir.Dir[1], bot.Pos.Line + dir.Dir[0]} // Update robot's position
+	posMap[bot.Pos] = "@"                                               // Place the robot at the new position
+
 	return posMap
 }
 
