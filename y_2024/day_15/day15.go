@@ -6,6 +6,19 @@ import (
 	"os"
 )
 
+type Pos struct {
+	Char, Line int
+}
+type Bot struct {
+	Pos       Pos
+	Dir       Direction
+	Movements []Direction
+}
+type Direction struct {
+	Name string
+	Dir  []int
+}
+
 // Expand the map for wide boxes
 func expandMap(room []string) []string {
 	var expanded []string

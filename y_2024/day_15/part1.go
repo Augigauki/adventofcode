@@ -51,26 +51,9 @@ func move2(room []string, dir int, objects [][2]int) []string {
 	return room
 }
 
-<<<<<<< HEAD
 func run2(room []string, sx, sy int, inst byte) ([]string, int, int) {
 	var objects [][2]int // To track parts of wide boxes
 	var x, y int         // New robot position after move
-=======
-func MoveBotWiderMap(posMap map[Pos]string, bot Bot, width, height int) {
-	fmt.Println("Moving bot in wider map")
-	for _, mov := range bot.Movements {
-		fmt.Println("\nBot pos: ", bot.Pos)
-		fmt.Println("Bot mov: ", mov)
-		nextPos := Pos{bot.Pos.Char + mov.Dir[1], bot.Pos.Line + mov.Dir[0]}
-		fmt.Println("Next pos: ", nextPos)
-		if posMap[nextPos] == "." {
-			fmt.Println("Next pos: ", nextPos, " value: ", posMap[nextPos])
-			fmt.Println("Next pos is empty, moving bot!")
-			posMap[bot.Pos] = "."
-			posMap[nextPos] = "@"
-			bot.Pos = nextPos
-			//printMap(posMap, width, height)
->>>>>>> d7e96cc (struggle continue)
 
 	switch inst {
 	case '^': // Move up
@@ -163,68 +146,6 @@ func MoveBotWiderMap(posMap map[Pos]string, bot Bot, width, height int) {
 		}
 	}
 	return room, x, y
-}
-
-func countSumBoxesCoordsX2(room []string) int {
-	sum := 0
-<<<<<<< HEAD
-	for y, line := range room {
-		for x := 0; x < len(line); x++ {
-			if line[x] == '[' {
-				sum += x + y*100
-			}
-=======
-	for boxPos, value := range posMap {
-		if value == "[" {
-			gps := 0
-			//fmt.Println("Box at pos: ", boxPos)
-			gps = (100 * boxPos.Char) + boxPos.Line
-			sum += gps
-		}
-	}
-	fmt.Println("Sum of GPS coordinates: ", sum)
-}
-
-func MoveBot(posMap map[Pos]string, bot Bot, width, height int) {
-	fmt.Println("Moving bot")
-	for _, mov := range bot.Movements {
-		fmt.Println("\nBot pos: ", bot.Pos)
-		fmt.Println("Bot mov: ", mov)
-		nextPos := Pos{bot.Pos.Char + mov.Dir[1], bot.Pos.Line + mov.Dir[0]}
-		fmt.Println("Next pos: ", nextPos)
-		if posMap[nextPos] == "." {
-			fmt.Println("Next pos: ", nextPos, " value: ", posMap[nextPos])
-			fmt.Println("Next pos is empty, moving bot!")
-			posMap[bot.Pos] = "."
-			posMap[nextPos] = "@"
-			bot.Pos = nextPos
-			//printMap(posMap, width, height)
-
-		} else if posMap[nextPos] == "#" {
-			fmt.Println("Next pos is wall")
-
-		} else if posMap[nextPos] == "O" {
-			fmt.Println("Next pos is a box!")
-			posMap = CheckIfBoxCanBeMoved(posMap, mov, &bot)
-
-		} else {
-			fmt.Println("Something is wrong with next pos...")
-			fmt.Printf("Next pos: %v, value: %v\n", nextPos, posMap[nextPos])
-		}
-		//printMap(posMap, width, height)
-	}
-	printMap(posMap, width, height)
-	sum := 0
-	//fmt.Println("PosMap: ", posMap)
-	for boxPos, value := range posMap {
-		if value == "O" {
-			gps := 0
-			//fmt.Println("Box at pos: ", boxPos)
-			gps = (100 * boxPos.Char) + boxPos.Line
-			sum += gps
-		}
-	}
-	fmt.Println("Sum of GPS coordinates: ", sum)
 }
 
 func CheckIfWideBoxCanBeMoved(posMap map[Pos]string, dir Direction, bot *Bot) map[Pos]string {
@@ -335,10 +256,10 @@ func CheckIfWideBoxCanBeMoved2(posMap map[Pos]string, dir Direction, bot *Bot) m
 			boxesMap[rightPos] = posMap[rightPos]
 		}
 		line--
-		for !checkNextLine(posMap, boxesMap, line) {
+		/* for !checkNextLine(posMap, boxesMap, line) {
 			boxesMap = findNextLineWideBoxes(posMap, boxesMap)
 			line--
-		}
+		} */
 		fmt.Println("Boxes map: ", boxesMap)
 
 	}
@@ -388,16 +309,4 @@ func findNextLineWideBoxes(posMap map[Pos]string, boxesMap map[Pos]string) map[P
 	}
 
 	return boxesMap
-}
-
-func checkNextLine(posMap map[Pos]string, boxesMap map[Pos]string, line int) bool {
-	fmt.Println("Checking next line...")
-	nextLineBlocked := false
-	for pos := range boxesMap {
-		if posMap[Pos{pos.Char, line}] == "#" {
-			nextLineBlocked = true
->>>>>>> d7e96cc (struggle continue)
-		}
-	}
-	return sum
 }
