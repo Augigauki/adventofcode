@@ -1,276 +1,161 @@
 package main
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
-func GetTotalGpsSum(goodsMap [][]string, bot Bot) {
-	//fmt.Println("Part 1")
-	fmt.Println("Part 2")
+func check2(room []string, y, x1, x2, dir int, objects *[][2]int) bool {
+	*objects = append(*objects, [2]int{x1, y}) // Add the current box part to the list
+	fmt.Println("Objects:", objects)
 
-	var PosMap = make(map[Pos]string)
-	wideMap := expandMap(goodsMap)
-	fmt.Println("Wide map: ")
-	for i, line := range wideMap {
-		fmt.Println(line)
-		for j, char := range line {
-			if char == "@" {
-				bot.Pos = Pos{i, j}
-			}
-		}
+	if room[y+dir][x1] == '#' || room[y+dir][x2] == '#' {
+		return false // Movement is blocked
 	}
-	width := len(wideMap[0])
-	height := len(wideMap)
-	for i, line := range wideMap {
-		for j, char := range line {
-			PosMap[Pos{i, j}] = char
-		}
+	if room[y+dir][x1] == '.' && room[y+dir][x2] == '.' {
+		return true // Movement is possible
+	}
+	// Check for recursive box connections
+	var results []bool
+	if room[y+dir][x1] == '[' {
+		results = append(results, check(room, y+dir, x1, x2, dir, objects))
+	}
+	if room[y+dir][x1] == ']' {
+		results = append(results, check(room, y+dir, x1-1, x2-1, dir, objects))
+	}
+	if room[y+dir][x2] == '[' {
+		results = append(results, check(room, y+dir, x1+1, x2+1, dir, objects))
 	}
 
-	MoveBotWiderMap(PosMap, bot, width, height)
-	//fmt.Println("PosMap: ", PosMap)
+	// If any part is blocked, the entire move is blocked
+	for _, res := range results {
+		if !res {
+			return false
+		}
+	}
+	return true
 }
 
-func expandMap(origMap [][]string) [][]string {
-	fmt.Println("Expanding map...")
-	wideMap := [][]string{}
-	for i, line := range origMap {
-		for j, char := range line {
-			if char == "#" {
-				origMap[i][j] = "##"
-			}
-			if char == "." {
-				origMap[i][j] = ".."
-			}
-			if char == "O" {
-				origMap[i][j] = "[]"
-			}
-			if char == "@" {
-				origMap[i][j] = "@."
-			}
-		}
+func move2(room []string, dir int, objects [][2]int) []string {
+	fmt.Println("Objects:", objects)
+
+	// Remove old box positions
+	for _, obj := range objects {
+		x, y := obj[0], obj[1]
+		room[y] = room[y][:x] + ".." + room[y][x+2:]
 	}
-	for _, line := range origMap {
-		var wideLine []string
-		for _, char := range line {
-			chars := strings.Split(char, "")
-			wideLine = append(wideLine, chars...)
-		}
-		wideMap = append(wideMap, wideLine)
+
+	// Add boxes in the new positions
+	for _, obj := range objects {
+		x, y := obj[0], obj[1]
+		room[y+dir] = room[y+dir][:x] + "[]" + room[y+dir][x+2:]
 	}
-	return wideMap
+
+	return room
 }
 
-func MoveBotWiderMap(posMap map[Pos]string, bot Bot, width, height int) {
-	fmt.Println("Moving bot in wider map")
-	/* fmt.Println("PosMap:")
-	for pos, value := range posMap {
-		fmt.Println(pos, value)
-	} */
-	for _, mov := range bot.Movements {
-		fmt.Println("\nBot pos: ", bot.Pos)
-		fmt.Println("Bot mov: ", mov)
-		nextPos := Pos{bot.Pos.Char + mov.Dir[1], bot.Pos.Line + mov.Dir[0]}
-		fmt.Println("Next pos: ", nextPos)
-		if posMap[nextPos] == "." {
-			fmt.Println("Next pos: ", nextPos, " value: ", posMap[nextPos])
-			fmt.Println("Next pos is empty, moving bot!")
-			posMap[bot.Pos] = "."
-			posMap[nextPos] = "@"
-			bot.Pos = nextPos
-			//printMap(posMap, width, height)
+func run2(room []string, sx, sy int, inst byte) ([]string, int, int) {
+	var objects [][2]int // To track parts of wide boxes
+	var x, y int         // New robot position after move
 
-		} else if posMap[nextPos] == "#" {
-			fmt.Println("Next pos is wall")
-
-		} else if posMap[nextPos] == "[" || posMap[nextPos] == "]" {
-			fmt.Println("Next pos is a box!")
-			posMap = CheckIfWideBoxCanBeMoved(posMap, mov, &bot)
-
-		} else {
-			fmt.Println("Something is wrong with next pos...")
-			fmt.Printf("Next pos: %v, value: %v\n", nextPos, posMap[nextPos])
+	switch inst {
+	case '^': // Move up
+		switch room[sy-1][sx] {
+		case '.': // Empty space
+			x, y = sx, sy-1
+			room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+			room[sy-1] = room[sy-1][:sx] + "@" + room[sy-1][sx+1:]
+		case '[': // Wide box
+			if check(room, sy-1, sx, sx+1, -1, &objects) {
+				room = move(room, -1, objects)
+				room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+				y--
+				room[sy] = room[sy][:sx] + "@" + room[sy][sx+1:]
+			}
+		case ']': // Wide box (right part)
+			if check(room, sy-1, sx-1, sx, -1, &objects) {
+				room = move(room, -1, objects)
+				room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+				y--
+				room[sy] = room[sy][:sx] + "@" + room[sy][sx+1:]
+			}
 		}
-		printMap(posMap, width, height)
+	case 'v': // Move down
+		switch room[sy+1][sx] {
+		case '.':
+			x, y = sx, sy+1
+			room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+			room[sy+1] = room[sy+1][:sx] + "@" + room[sy+1][sx+1:]
+		case '[':
+			if check(room, sy+1, sx, sx+1, +1, &objects) {
+				room = move(room, +1, objects)
+				room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+				y++
+				room[sy] = room[sy][:sx] + "@" + room[sy][sx+1:]
+			}
+		case ']':
+			if check(room, sy+1, sx-1, sx, +1, &objects) {
+				room = move(room, +1, objects)
+				room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+				y++
+				room[sy] = room[sy][:sx] + "@" + room[sy][sx+1:]
+			}
+		}
+	case '<': // Move left
+		switch room[sy][sx-1] {
+		case '.':
+			x, y = sx-1, sy
+			room[sy] = room[sy][:sx-1] + "@" + room[sy][sx:]
+			room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+		case ']':
+			for i := sx - 1; i > 0; i-- {
+				if room[sy][i] == '#' {
+					break
+				}
+				if room[sy][i] == '.' {
+					x, y = sx-1, sy
+					room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+					room[sy] = room[sy][:sx-1] + "@" + room[sy][sx:]
+					for j := i; j < sx-1; j += 2 {
+						room[sy] = room[sy][:j] + "[" + room[sy][j+1:]
+						room[sy] = room[sy][:j+1] + "]" + room[sy][j+2:]
+					}
+					break
+				}
+			}
+		}
+	case '>': // Move right
+		switch room[sy][sx+1] {
+		case '.':
+			x, y = sx+1, sy
+			room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+			room[sy] = room[sy][:sx+1] + "@" + room[sy][sx+2:]
+		case '[':
+			for i := sx + 1; i < len(room[sy]); i++ {
+				if room[sy][i] == '#' {
+					break
+				}
+				if room[sy][i] == '.' {
+					x, y = sx+1, sy
+					room[sy] = room[sy][:sx] + "." + room[sy][sx+1:]
+					room[sy] = room[sy][:sx+1] + "@" + room[sy][sx+2:]
+					for j := i; j > sx+1; j -= 2 {
+						room[sy] = room[sy][:j] + "]" + room[sy][j+1:]
+						room[sy] = room[sy][:j-1] + "[" + room[sy][j:]
+					}
+					break
+				}
+			}
+		}
 	}
-	printMap(posMap, width, height)
+	return room, x, y
+}
+
+func countSumBoxesCoordsX2(room []string) int {
 	sum := 0
-	for boxPos, value := range posMap {
-		if value == "[" {
-			gps := 0
-			//fmt.Println("Box at pos: ", boxPos)
-			gps = (100 * boxPos.Char) + boxPos.Line
-			sum += gps
-		}
-	}
-	fmt.Println("Sum of GPS coordinates: ", sum)
-}
-
-func MoveBot(posMap map[Pos]string, bot Bot, width, height int) {
-	fmt.Println("Moving bot")
-	for _, mov := range bot.Movements {
-		fmt.Println("\nBot pos: ", bot.Pos)
-		fmt.Println("Bot mov: ", mov)
-		nextPos := Pos{bot.Pos.Char + mov.Dir[1], bot.Pos.Line + mov.Dir[0]}
-		fmt.Println("Next pos: ", nextPos)
-		if posMap[nextPos] == "." {
-			fmt.Println("Next pos: ", nextPos, " value: ", posMap[nextPos])
-			fmt.Println("Next pos is empty, moving bot!")
-			posMap[bot.Pos] = "."
-			posMap[nextPos] = "@"
-			bot.Pos = nextPos
-			//printMap(posMap, width, height)
-
-		} else if posMap[nextPos] == "#" {
-			fmt.Println("Next pos is wall")
-
-		} else if posMap[nextPos] == "O" {
-			fmt.Println("Next pos is a box!")
-			posMap = CheckIfBoxCanBeMoved(posMap, mov, &bot)
-
-		} else {
-			fmt.Println("Something is wrong with next pos...")
-			fmt.Printf("Next pos: %v, value: %v\n", nextPos, posMap[nextPos])
-		}
-		//printMap(posMap, width, height)
-	}
-	printMap(posMap, width, height)
-	sum := 0
-	//fmt.Println("PosMap: ", posMap)
-	for boxPos, value := range posMap {
-		if value == "O" {
-			gps := 0
-			//fmt.Println("Box at pos: ", boxPos)
-			gps = (100 * boxPos.Char) + boxPos.Line
-			sum += gps
-		}
-	}
-	fmt.Println("Sum of GPS coordinates: ", sum)
-}
-
-func CheckIfWideBoxCanBeMoved(posMap map[Pos]string, dir Direction, bot *Bot) map[Pos]string {
-	fmt.Println("Checking if wide box can be moved...")
-
-	// Identify the position of the first box part
-	origPos := bot.Pos
-	nextPos := Pos{bot.Pos.Char + dir.Dir[1], bot.Pos.Line + dir.Dir[0]}
-
-	// Identify all parts of the wide box
-	var boxParts []Pos
-	if posMap[nextPos] == "[" {
-		// Horizontal wide box (left-to-right)
-		boxParts = []Pos{nextPos, Pos{nextPos.Char + 1, nextPos.Line}}
-	} else if posMap[nextPos] == "]" {
-		// Horizontal wide box (right-to-left)
-		boxParts = []Pos{nextPos, Pos{nextPos.Char - 1, nextPos.Line}}
-	} else if posMap[nextPos] == "." {
-		fmt.Println("No box to move.")
-		return posMap
-	} else {
-		fmt.Println("Unexpected state: Box not detected!")
-		return posMap
-	}
-
-	// Check if all parts of the box can move
-	var newBoxPositions []Pos
-	for _, part := range boxParts {
-		newPos := Pos{part.Char + dir.Dir[1], part.Line + dir.Dir[0]}
-		if posMap[newPos] != "." {
-			fmt.Println("Wide box cannot be moved. Obstacle detected.")
-			return posMap
-		}
-		newBoxPositions = append(newBoxPositions, newPos)
-	}
-
-	// Move the wide box
-	for _, part := range boxParts {
-		posMap[part] = "." // Clear the old box positions
-	}
-	for i, newPos := range newBoxPositions {
-		if i == 0 {
-			posMap[newPos] = "[" // First part of the box
-		} else {
-			posMap[newPos] = "]" // Second part of the box
-		}
-	}
-
-	// Move the robot
-	posMap[origPos] = "."                                               // Clear the robot's old position
-	bot.Pos = Pos{bot.Pos.Char + dir.Dir[1], bot.Pos.Line + dir.Dir[0]} // Update robot's position
-	posMap[bot.Pos] = "@"                                               // Place the robot at the new position
-
-	return posMap
-}
-
-func findNextLineWideBoxes(posMap map[Pos]string, botPos Pos, dir Direction) map[Pos]string {
-	fmt.Println("Finding next line wide boxes...")
-	nextPos := Pos{botPos.Char + dir.Dir[1], botPos.Line + dir.Dir[0]}
-	boxesMap := make(map[Pos]string)
-	boxesMap[nextPos] = posMap[nextPos]
-	leftPos := Pos{nextPos.Char - 1, nextPos.Line}
-	rightPos := Pos{nextPos.Char + 1, nextPos.Line}
-	for posMap[leftPos] == "[" || posMap[leftPos] == "]" {
-		boxesMap[leftPos] = posMap[leftPos]
-		leftPos = Pos{leftPos.Char - 1, leftPos.Line}
-	}
-	for posMap[rightPos] == "[" || posMap[rightPos] == "]" {
-		boxesMap[rightPos] = posMap[rightPos]
-		rightPos = Pos{rightPos.Char + 1, rightPos.Line}
-	}
-	return boxesMap
-}
-
-func checkNextLine(posMap map[Pos]string, boxesMap map[Pos]string, line int) bool {
-	fmt.Println("Checking next line...")
-	nextLineBlocked := false
-	for pos := range boxesMap {
-		if posMap[Pos{pos.Char, line}] == "#" {
-			nextLineBlocked = true
-		}
-	}
-	return nextLineBlocked
-}
-
-func CheckIfBoxCanBeMoved(posMap map[Pos]string, dir Direction, bot *Bot) map[Pos]string {
-	fmt.Println("Checking if box can be moved...")
-	origPos := bot.Pos
-	nextPos := Pos{bot.Pos.Char + dir.Dir[1], bot.Pos.Line + dir.Dir[0]}
-	origNextPos := nextPos
-	boxesMap := make(map[Pos]string)
-	for posMap[nextPos] == "O" {
-		nextPos = Pos{nextPos.Char + dir.Dir[1], nextPos.Line + dir.Dir[0]}
-		boxesMap[nextPos] = "O"
-	}
-	fmt.Println("Done checking boxes")
-	fmt.Println("Boxes map: ", boxesMap)
-	if posMap[nextPos] == "." {
-		fmt.Println("Box can be moved")
-		i := len(boxesMap)
-		for boxPos := range boxesMap {
-			fmt.Println("boxPos: ", boxPos)
-			if i == 0 {
-				posMap[boxPos] = "O"
-			} else {
-				posMap[boxPos] = "O"
+	for y, line := range room {
+		for x := 0; x < len(line); x++ {
+			if line[x] == '[' {
+				sum += x + y*100
 			}
-			i--
 		}
-		bot.Pos = origNextPos
-		posMap[origPos] = "."
-		posMap[bot.Pos] = "@"
-	} else {
-		fmt.Println("Box can't be moved")
 	}
-	return posMap
-
-}
-
-func printMap(posMap map[Pos]string, width, height int) {
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
-			fmt.Print(posMap[Pos{i, j}])
-		}
-		fmt.Println()
-	}
+	return sum
 }
