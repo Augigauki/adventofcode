@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func check2(room []string, y, x1, x2, dir int, objects *[][2]int) bool {
+/* func check2(room []string, y, x1, x2, dir int, objects *[][2]int) bool {
 	*objects = append(*objects, [2]int{x1, y}) // Add the current box part to the list
 	fmt.Println("Objects:", objects)
 
@@ -31,9 +31,9 @@ func check2(room []string, y, x1, x2, dir int, objects *[][2]int) bool {
 		}
 	}
 	return true
-}
+} */
 
-func move2(room []string, dir int, objects [][2]int) []string {
+/* func move2(room []string, dir int, objects [][2]int) []string {
 	fmt.Println("Objects:", objects)
 
 	// Remove old box positions
@@ -49,9 +49,9 @@ func move2(room []string, dir int, objects [][2]int) []string {
 	}
 
 	return room
-}
+} */
 
-func run2(room []string, sx, sy int, inst byte) ([]string, int, int) {
+/* func run2(room []string, sx, sy int, inst byte) ([]string, int, int) {
 	var objects [][2]int // To track parts of wide boxes
 	var x, y int         // New robot position after move
 
@@ -146,7 +146,7 @@ func run2(room []string, sx, sy int, inst byte) ([]string, int, int) {
 		}
 	}
 	return room, x, y
-}
+} */
 
 func CheckIfWideBoxCanBeMoved(posMap map[Pos]string, dir Direction, bot *Bot) map[Pos]string {
 	fmt.Println("Checking if wide box can be moved...")
@@ -290,7 +290,7 @@ func CheckIfWideBoxCanBeMoved2(posMap map[Pos]string, dir Direction, bot *Bot) m
 	return posMap
 }
 
-func findNextLineWideBoxes(posMap map[Pos]string, boxesMap map[Pos]string) map[Pos]string {
+/* func findNextLineWideBoxes(posMap map[Pos]string, boxesMap map[Pos]string) map[Pos]string {
 	fmt.Println("Finding next line wide boxes...")
 	//nextPos := Pos{botPos.Char + dir.Dir[1], botPos.Line + dir.Dir[0]}
 
@@ -309,4 +309,4 @@ func findNextLineWideBoxes(posMap map[Pos]string, boxesMap map[Pos]string) map[P
 	}
 
 	return boxesMap
-}
+} */
