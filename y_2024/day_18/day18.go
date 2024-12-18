@@ -30,8 +30,9 @@ type Me struct {
 
 var Directions = []Direction{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 
+var example = false
+
 func main() {
-	example := true
 	size := 0
 	nSeconds := 0
 	fileName := ""
@@ -76,9 +77,24 @@ func main() {
 
 func CorruptMore(memSpace [][]string, bytes []Byte) {
 	fmt.Println("Part 2:")
-	for len(findPaths(memSpace)) > 0 {
-		memSpace = corruptMemory(memSpace, bytes, 1)
+	fmt.Println("Length of findPaths: ", len(findPaths(memSpace)))
+	paths := len(findPaths(memSpace))
+	i := 0
+	if example {
+		i = 12
+	} else {
+		i = 1024
 	}
+	for paths > 0 {
+		memSpace = corruptMemory(memSpace, bytes, i)
+		for _, row := range memSpace {
+			fmt.Println(row)
+		}
+		paths = len(findPaths(memSpace))
+		fmt.Println("Length of findPaths: ", paths)
+		i++
+	}
+	fmt.Println("Blocking obstacle: ", bytes[i-2])
 }
 
 func findPaths(memSpace [][]string) [][]Pos {
