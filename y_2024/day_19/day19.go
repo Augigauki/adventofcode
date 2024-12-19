@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var example = true
+var example = false
 
 func main() {
 	fileName := ""
@@ -18,45 +18,35 @@ func main() {
 		fileName = "input.txt"
 	}
 	patterns, designs := parseFile(fileName)
-	fmt.Println("Patterns:")
-	for _, pattern := range patterns {
-		fmt.Println(pattern)
-	}
-	fmt.Println("\nDesigns:")
-	for _, design := range designs {
-		fmt.Println(design)
-	}
+
 	possibleDesigns := 0
+	fmt.Println("\nPart 1")
 	for _, design := range designs {
-		matching := getMatchingPatterns(patterns, design)
-		canBeMade := canDesignBeMade(matching, design, map[string]bool{})
-		if canBeMade {
+		if canDesignBeMade(patterns, design, map[string]bool{}) {
 			possibleDesigns++
 		}
 	}
 	fmt.Println("Possible designs: ", possibleDesigns)
-}
 
-func getMatchingPatterns(patterns []string, design string) []string {
-	matchingPatterns := []string{}
-	for _, pattern := range patterns {
-		if strings.Contains(design, pattern) {
-			matchingPatterns = append(matchingPatterns, pattern)
-		}
+	fmt.Println("\nPart 2:")
+	allPossibleWays := 0
+	for _, design := range designs {
+		fmt.Println("Checking with BFS for design:", design)
+		ways := countWaysToMakeDesign(patterns, design, map[string]int{})
+		fmt.Println("Ways to make design:", ways)
+		allPossibleWays += ways
 	}
-	return matchingPatterns
+	fmt.Println("All possible ways to make designs:", allPossibleWays)
 }
 
 func canDesignBeMade(patterns []string, design string, memo map[string]bool) bool {
-	if result, ok := memo[design]; ok { // Check if result is already memoized
+	if result, ok := memo[design]; ok {
 		return result
 	}
-
 	if design == "" {
 		memo[design] = true
 		return true
 	}
-
 	for _, pattern := range patterns {
 		if strings.HasPrefix(design, pattern) {
 			remainingDesign := strings.TrimPrefix(design, pattern)
@@ -66,9 +56,29 @@ func canDesignBeMade(patterns []string, design string, memo map[string]bool) boo
 			}
 		}
 	}
-
 	memo[design] = false
 	return false
+}
+
+func countWaysToMakeDesign(patterns []string, design string, cache map[string]int) int {
+	if ways, ok := cache[design]; ok {
+		return ways
+	}
+
+	if design == "" {
+		return 1 // Base case: one way to make an empty design
+	}
+
+	ways := 0
+	for _, pattern := range patterns {
+		if strings.HasPrefix(design, pattern) {
+			remainingDesign := strings.TrimPrefix(design, pattern)
+			ways += countWaysToMakeDesign(patterns, remainingDesign, cache)
+		}
+	}
+
+	cache[design] = ways
+	return ways
 }
 
 func parseFile(fileName string) ([]string, []string) {
