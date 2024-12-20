@@ -15,11 +15,12 @@ type Pos struct {
 	x, y int
 }
 
-var example = true
+var example = false
 
 var Directions = []Direction{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 
-var startPos, endPos = Pos{0, 0}, Pos{0, 0}
+var startPos = Pos{0, 0}
+var endPos = Pos{0, 0}
 var width, height = 0, 0
 
 func main() {
