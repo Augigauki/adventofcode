@@ -22,7 +22,12 @@ func part1() {
 	// 2. Iterate through point pairs and check for savings
 	count := 0
 	usedCheats := make(map[string]bool) // Keep track of unique cheat start/end pairs
-
+	threshold := 0
+	if example {
+		threshold = 2
+	} else {
+		threshold = 100
+	}
 	for p1, dist1 := range distances {
 		for p2, dist2 := range distances {
 			if dist1 >= dist2 {
@@ -31,7 +36,7 @@ func part1() {
 
 			manhattanDist := math.Abs(float64(p1.x-p2.x)) + math.Abs(float64(p1.y-p2.y))
 
-			if manhattanDist == 2 && (dist2-dist1)-int(manhattanDist) >= 100 && isWithinTwoWalls(p1, p2, racetrack) {
+			if manhattanDist == 2 && (dist2-dist1)-int(manhattanDist) >= threshold && isWithinTwoWalls(p1, p2, racetrack) {
 				// Create a unique key for this cheat (start and end positions)
 				cheatKey := fmt.Sprintf("%d,%d-%d,%d", p1.x, p1.y, p2.x, p2.y)
 

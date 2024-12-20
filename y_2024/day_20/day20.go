@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"container/heap"
 	"fmt"
 	"log"
+	"math"
 	"os"
 )
 
@@ -15,7 +17,14 @@ type Pos struct {
 	x, y int
 }
 
-var example = false
+type Item struct {
+	value    Pos // The value of the item; arbitrary.
+	priority int // The priority of the item in the queue.
+	// The index is needed by update and is maintained by the heap.Interface methods.
+	index int // The index of the item in the heap.
+}
+
+type PriorityQueue []*Item
 
 var Directions = []Direction{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 
@@ -23,90 +32,104 @@ var startPos = Pos{0, 0}
 var endPos = Pos{0, 0}
 var width, height = 0, 0
 
-func main() {
-	part1()
+func (pq PriorityQueue) Len() int { return len(pq) }
 
+func (pq PriorityQueue) Less(i, j int) bool {
+	return pq[i].priority < pq[j].priority
 }
 
-/* Old code from first attempts */
-func findCheats(path []Pos, racetrack map[Pos]string) map[int]int {
-	cheatSavings := make(map[int]int)
-	length := len(path)
-	for i := 0; i < 1; i++ {
-		cheatPos := path[i]
-		//fmt.Println("Checking cheats for pos: ", cheatPos)
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].index = i
+	pq[j].index = j
+}
+
+func (pq *PriorityQueue) Push(x interface{}) {
+	n := len(*pq)
+	item := x.(*Item)
+	item.index = n
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil  // avoid memory leak
+	item.index = -1 // for safety
+	*pq = old[0 : n-1]
+	return item
+}
+
+func (pq *PriorityQueue) update(item *Item, priority int) {
+	item.priority = priority
+	heap.Fix(pq, item.index)
+}
+
+// Dijkstra's Algorithm
+func dijkstra(racetrack map[Pos]string, startPos Pos) (map[Pos]int, map[Pos]Pos) {
+	distances := make(map[Pos]int)
+	previous := make(map[Pos]Pos) // To store the path
+	pq := make(PriorityQueue, 0)
+
+	distances[startPos] = 0
+	heap.Init(&pq)
+	item := &Item{value: startPos, priority: 0}
+	heap.Push(&pq, item)
+
+	for pq.Len() > 0 {
+		current := heap.Pop(&pq).(*Item).value
+		if current == endPos {
+			break
+		}
+
 		for _, dir := range Directions {
-			newPos := Pos{cheatPos.x + dir.x, cheatPos.y + dir.y}
-			if newPos.x < 0 || newPos.x >= width || newPos.y < 0 || newPos.y >= height {
+			neighbor := Pos{current.x + dir.x, current.y + dir.y}
+			if _, ok := racetrack[neighbor]; !ok || racetrack[neighbor] == "#" {
 				continue
 			}
-			if racetrack[newPos] == "#" {
-				for _, dir2 := range Directions {
-					newPos2 := Pos{newPos.x + dir2.x, newPos.y + dir2.y}
-					if newPos2.x < 0 || newPos2.x >= width || newPos2.y < 0 || newPos2.y >= height {
-						continue
-					}
-					if racetrack[newPos2] == "#" {
-						if newPos2 == newPos {
-							continue
+
+			newDist := distances[current] + 1
+			if oldDist, ok := distances[neighbor]; !ok || newDist < oldDist {
+				distances[neighbor] = newDist
+				previous[neighbor] = current
+				if oldDist == 0 {
+					heap.Push(&pq, &Item{value: neighbor, priority: newDist})
+				} else {
+					// Update priority if neighbor is already in the queue - this is a simplification
+					for _, existingItem := range pq {
+						if existingItem.value == neighbor {
+							pq.update(existingItem, newDist)
+							break
 						}
-						for _, dir3 := range Directions {
-							newPos3 := Pos{newPos2.x + dir3.x, newPos2.y + dir3.y}
-							if newPos3.x < 0 || newPos3.x >= width || newPos3.y < 0 || newPos3.y >= height {
-								continue
-							}
-							if racetrack[newPos3] == "O" {
-								if newPos3 == cheatPos {
-									continue
-								}
-								//fmt.Println("New pos3: ", newPos3)
-								pathPos := findPositionInPath(path, newPos3)
-								//fmt.Println("Path pos: ", pathPos)
-								newLength := getCheatScore(length, pathPos)
-								saved := length - newLength - 2
-								//fmt.Printf("Saved: length-1 (%v) - i (%v) - steps(%v)\n", length-1, pathPos, 2)
-								cheatSavings[saved]++
-								//fmt.Println("Found cheat!")
-								continue
-							}
-						}
-					}
-					if racetrack[newPos2] == "O" {
-						if newPos2 == cheatPos {
-							continue
-						}
-						//fmt.Println("New pos2: ", newPos2)
-						pathPos := findPositionInPath(path, newPos2)
-						newLength := getCheatScore(length, pathPos)
-						saved := length - newLength - 1
-						//fmt.Printf("Saved: length-1 (%v) - i (%v) - steps(%v)\n", length-1, pathPos, 2)
-						cheatSavings[saved]++
-						//fmt.Println("Found cheat!")
-						continue
 					}
 				}
 			}
-
 		}
 	}
-	return cheatSavings
+
+	return distances, previous
 }
 
-func getCheatScore(endIndex, index int) int {
-	return endIndex - index
+// Reconstruct the path from the start to a given position
+func reconstructPath(previous map[Pos]Pos, end Pos) []Pos {
+	var path []Pos
+	current := end
+
+	for {
+		path = append([]Pos{current}, path...)
+		prev, ok := previous[current]
+		if !ok {
+			break // No previous node, we've reached the start
+		}
+		current = prev
+	}
+
+	return path
 }
 
 func isWithinBounds(pos Pos) bool {
 	return pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height
-}
-
-func isPathPosition(path []Pos, pos Pos) bool {
-	for _, p := range path {
-		if p == pos {
-			return true
-		}
-	}
-	return false
 }
 
 func findPositionInPath(path []Pos, pos Pos) int {
@@ -160,4 +183,8 @@ func parseFile(fileName string) map[Pos]string {
 	}
 	height = y
 	return memSpace
+}
+
+func manhattanDistBetween(p1, p2 Pos) int {
+	return int(math.Abs(float64(p1.x-p2.x)) + math.Abs(float64(p1.y-p2.y)))
 }
