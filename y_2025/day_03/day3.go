@@ -24,7 +24,7 @@ func main() {
 			digits = append(digits, digit)
 
 		}
-		highestJoltage := findLargestJoltage(digits)
+		highestJoltage := find12DigitJoltage(digits)
 		joltages = append(joltages, highestJoltage)
 
 	}
