@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("input.txt")
+	file, err := os.Open("example.txt")
 	if err != nil {
 		fmt.Println("Error reading file")
 		return
@@ -24,6 +24,6 @@ func main() {
 		}
 		paperMap = append(paperMap, chars)
 	}
-	papers := findAccessiblePaper(paperMap)
-	fmt.Println("Accessible papers found:", papers)
+	papers := removeAllPaper(paperMap)
+	fmt.Println("All papers found:", papers)
 }
